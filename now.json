@@ -1,0 +1,9 @@
+{
+  "name": "skedulr",
+  "aliases": [
+    "beta.skedulr.io"
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
