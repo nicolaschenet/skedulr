@@ -1,8 +1,13 @@
-import decode from 'jwt-decode';
-import {EventEmitter} from 'events';
+import * as firebase from "firebase";
+
 import React, {Component, PropTypes} from 'react';
-import {browserHistory} from 'react-router';
+
 import Auth0Lock from 'auth0-lock';
+import {EventEmitter} from 'events';
+import R from 'ramda'
+import auth0 from 'auth0-js'
+import {browserHistory} from 'react-router';
+import decode from 'jwt-decode';
 
 const NEXT_PATH_KEY = 'next_path';
 const ID_TOKEN_KEY = 'id_token';
@@ -25,22 +30,63 @@ const lock = new Auth0Lock(
   }
 );
 
+const auth0Authentication = new auth0.Authentication({ 
+  clientID: process.env.REACT_APP_AUTH0_CLIENT_ID,
+  domain : process.env.REACT_APP_AUTH0_DOMAIN
+})
+
 const events = new EventEmitter();
 
+const updateFirebaseUser = id => firebase.database().ref(`users/${id}`).set(getFirebaseProfile())
+
+// listen to when the user gets authenticated and then save the profile
 lock.on('authenticated', authResult => {
+
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+      return
+    }
+    console.log('Firebase | Logged as', user.uid)
+    updateFirebaseUser(user.uid)
+  })
+
   setIdToken(authResult.idToken);
   setAccessToken(authResult.accessToken);
-  lock.getUserInfo(authResult.accessToken, (error, profile) => {
-    if (error) { return setProfile({error}); }
+  
+  lock.getProfile(authResult.idToken, function(error, profile) {
+   
+    if (error) { return setProfile({ error }); }
+   
+    console.log('Auth0 | Logged as', profile.user_id)
+   
     setProfile(profile);
     browserHistory.push(getNextPath());
     clearNextPath();
+    
+    // Set the options to retreive a firebase delegation token
+    var delegationOptions = {
+      api_type : 'firebase',
+      client_id: process.env.REACT_APP_AUTH0_CLIENT_ID,
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      id_token : authResult.idToken,
+      target: process.env.REACT_APP_AUTH0_CLIENT_ID,
+      scope : 'openid profile email'
+    };
+
+    // Make a call to the Auth0 '/delegate'
+    auth0Authentication.delegation(delegationOptions, (err, result) => {
+      if(!err) {
+        // Exchange the delegate token for a Firebase auth token
+        firebase.auth().signInWithCustomToken(result.idToken).catch(error => {
+          console.log(error);
+        });
+      }
+    });
   });
 });
 
 export function login(options) {
   lock.show(options);
-
   return {
     hide() {
       lock.hide();
@@ -52,6 +98,10 @@ export function logout() {
   clearNextPath();
   clearIdToken();
   clearProfile();
+  firebase.auth().signOut().then(
+    () => console.log('Firebase | Logged out'), 
+    error => console.log(error)
+  );
   browserHistory.push(LOGIN_ROUTE);
 }
 
@@ -69,7 +119,7 @@ export function connectProfile(WrappedComponent) {
     };
 
     componentWillMount() {
-      this.profileSubscription = subscribeToProfile((profile) => {
+      this.profileSubscription = subscribeToProfile(profile => {
         this.setState({profile});
       });
     }
@@ -88,7 +138,7 @@ export function connectProfile(WrappedComponent) {
       );
     }
 
-    onUpdateProfile = (newProfile) => {
+    onUpdateProfile = newProfile => {
       return updateProfile(this.state.profile.user_id, newProfile);
     }
   };
@@ -141,9 +191,9 @@ async function updateProfile(userId, newProfile) {
       method: 'PATCH',
       body: JSON.stringify(newProfile)
     });
-
     const profile = await response.json();
     setProfile(profile);
+    updateFirebaseUser(profile.user_id)
   } catch (error) {
     return error;
   }
@@ -156,6 +206,18 @@ function setProfile(profile) {
 
 function getProfile() {
   return JSON.parse(localStorage.getItem(PROFILE_KEY));
+}
+
+const getFirebaseProfile = () => {
+  return R.omit([
+    'clientID', 
+    'global_client_id', 
+    'last_ip',
+    'last_login',
+    'logins_count',
+    'user_id', 
+    'sub'
+  ], getProfile())
 }
 
 function clearProfile() {
