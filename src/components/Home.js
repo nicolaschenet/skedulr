@@ -16,7 +16,7 @@ class Home extends Component {
     return (
       <div className="Home">
         <div className="Home-intro">
-          <h2>Select your preferred date and hour </h2>
+          <h2>Coming soon...</h2>
         </div>
       </div>
     );

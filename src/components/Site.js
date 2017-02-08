@@ -25,8 +25,8 @@ const Logged = props => (
     iconButtonElement={
       <IconButton><MoreVertIcon color="white" /></IconButton>
     }
-    targetOrigin={{horizontal: 'right', vertical: 'middle'}}
-    anchorOrigin={{horizontal: 'right', vertical: 'middle'}}
+    targetOrigin={{horizontal: 'right', vertical: 'center'}}
+    anchorOrigin={{horizontal: 'right', vertical: 'center'}}
   >
     <MenuItem primaryText="View profile" />
     <MenuItem primaryText="Sign out" onClick={() => logout()} />
@@ -51,7 +51,7 @@ class Site extends Component {
     return (
       <div className="Site">
         <AppBar
-          title="Crew"
+          title="S K E D U L R"
           iconElementLeft={<div></div>}
           iconElementRight={profile ? <Logged /> : <Login />}
         />

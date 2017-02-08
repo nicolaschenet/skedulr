@@ -6,7 +6,7 @@ import React, {Component} from 'react';
 
 class Map extends Component {
   componentDidMount() {
-    const homePosition = new google.maps.LatLng(48.863091, 2.3604313)
+    const homePosition = new google.maps.LatLng(48.863105, 2.362620)
     const infoWindow = new google.maps.InfoWindow({
       content: '41 rue Charlot, Paris (75003)'
     })
