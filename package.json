@@ -25,7 +25,7 @@
     "serve": "^3.2.7"
   },
   "scripts": {
-    "deploy": "now --alias --dotenv",
+    "deploy": "npm run build && firebase deploy",
     "start": "react-scripts start",
     "now-start": "serve ./build --single",
     "build": "react-scripts build",
