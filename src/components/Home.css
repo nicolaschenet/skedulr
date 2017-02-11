@@ -1,3 +1,21 @@
-.Home-intro {
-  font-size: large;
+.Home {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.Home-Header {
+  color: #ddd;
+  font-size: 1.3rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+
+.Home-Header--title {
+  color: #aaa;
+  margin-right: 10px;
 }

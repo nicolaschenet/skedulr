@@ -7,35 +7,31 @@ import {connectProfile, logout} from '../auth';
 
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import AppBar from 'material-ui/AppBar';
-import Avatar from 'material-ui/Avatar';
-import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import {Link} from 'react-router';
-import Map from './Map'
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import RaisedButton from 'material-ui/RaisedButton';
+import {browserHistory} from 'react-router';
 import {fullWhite} from 'material-ui/styles/colors';
 
 const Logged = props => (
   <IconMenu
     {...props}
     iconButtonElement={
-      <IconButton><MoreVertIcon color="white" /></IconButton>
+      <IconButton><MoreVertIcon color={fullWhite} /></IconButton>
     }
     targetOrigin={{horizontal: 'right', vertical: 'center'}}
     anchorOrigin={{horizontal: 'right', vertical: 'center'}}
   >
-    <MenuItem primaryText="View profile" />
+    <MenuItem primaryText="View profile" onClick={() => browserHistory.push('/profile/edit')}/>
     <MenuItem primaryText="Sign out" onClick={() => logout()} />
   </IconMenu>
 );
 
 const Login = () => (
   <Link to='/login'>
-    <FlatButton icon={<ActionAccountCircle color={fullWhite} />} />
+    <IconButton><ActionAccountCircle color={fullWhite} /></IconButton>
   </Link>
 )
 
@@ -48,23 +44,26 @@ class Site extends Component {
 
   render() {
     const { profile } = this.props
+    const style = {
+      appBar: {
+        root: {
+          position: 'absolute'
+        },
+        title: {
+          fontSize: '1rem',
+          fontWeight: 300
+        }
+      }
+    }
     return (
       <div className="Site">
         <AppBar
           title="S K E D U L R"
           iconElementLeft={<div></div>}
-          iconElementRight={profile ? <Logged /> : <Login />}
+          iconElementRight={profile ? <Logged profile={profile} /> : <Login />}
+          titleStyle={style.appBar.title}
+          style={style.appBar.root}
         />
-        <div className="Site-header">
-          <Map />
-          {profile && 
-            <div className="Site-profileControls">
-              <Link to="/profile/edit">
-                <Avatar src={profile.picture} alt={profile.nickname}/>
-              </Link>
-            </div>
-          }
-        </div>
         <div className="Site-page">
           {this.props.children}
         </div>

@@ -1,26 +1,21 @@
 /* eslint no-undef:off */
 import './Home.css';
 
-import React, {Component} from 'react';
+import FlatButton from 'material-ui/FlatButton';
+import React from 'react';
 
-import {Link} from 'react-router';
-import {connectProfile} from '../auth';
-
-class Home extends Component {
-  static propTypes = {
-    ...connectProfile.PropTypes
-  };
-
-  render() {
-
-    return (
-      <div className="Home">
-        <div className="Home-intro">
-          <h2>Coming soon...</h2>
-        </div>
-      </div>
-    );
-  }
+export default function Home () {
+  return (
+    <div className='Home'>
+      <h2 className='Home-Header'>
+        <span className='Home-Header--title'>Skedulr</span>
+        is coming
+      </h2>
+      <FlatButton 
+        label="View an example party" 
+        secondary={true} 
+        href='parties/-KcVQxXvUq8Coac1iixz'
+      />
+    </div> 
+  )
 }
-
-export default connectProfile(Home);

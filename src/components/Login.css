@@ -1,3 +1,10 @@
+.Login {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .Login-loginButton {
   display: inline-block;
   margin: 0px auto;
