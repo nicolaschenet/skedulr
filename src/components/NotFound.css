@@ -1,0 +1,18 @@
+.NotFound {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.NotFound .NotFound-Header {
+  color: #aaa;
+  font-size: 1.2rem;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.NotFound .NotFound-Header .NotFound-Header--code {
+  color: #ddd;
+  margin-right: 10px;
+}
