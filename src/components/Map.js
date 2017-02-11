@@ -2,29 +2,36 @@
 
 import './Map.css';
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+
+import firebase from 'firebase';
 
 class Map extends Component {
   componentDidMount() {
-    const homePosition = new google.maps.LatLng(48.863105, 2.362620)
-    const infoWindow = new google.maps.InfoWindow({
-      content: '41 rue Charlot, Paris (75003)'
+     firebase.database().ref(this.props.firebaseRef).on('value', snapshot => {
+      const party = snapshot.val()
+      const { address, coordinates } = party
+      const { lat, long } = coordinates
+      const partyPosition = new google.maps.LatLng(lat, long)
+      const infoWindow = new google.maps.InfoWindow({
+        content: address
+      })
+      const map = new google.maps.Map(document.getElementById('map'), {
+        center: partyPosition,
+        zoom: 15
+      })
+      const partyMarker = new google.maps.Marker({
+        animation: google.maps.Animation.DROP,
+        map: map,
+        place: {
+          location: partyPosition,
+          query: address
+        }
+      })
+      partyMarker.addListener('click', function() {
+        infoWindow.open(map, partyMarker);
+      });
     })
-    const map = new google.maps.Map(document.getElementById('map'), {
-      center: homePosition,
-      zoom: 15
-    })
-    const homeMarker = new google.maps.Marker({
-      animation: google.maps.Animation.DROP,
-      map: map,
-      place: {
-        location: homePosition,
-        query: '41, rue Charlot, Paris'
-      }
-    })
-    homeMarker.addListener('click', function() {
-      infoWindow.open(map, homeMarker);
-    });
   }
   render() {
     return (

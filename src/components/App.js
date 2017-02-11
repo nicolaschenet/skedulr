@@ -7,6 +7,7 @@ import EditProfile from './EditProfile';
 import Home from './Home';
 import Login from './Login';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Party from './Party';
 import Site from './Site';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import {requireAuth} from '../auth';
@@ -32,6 +33,7 @@ class App extends Component {
             <Route path="/login" component={Login} />
             <Route onEnter={requireAuth}>
               <Route path="/profile/edit" component={EditProfile} />
+              <Route path="/parties/:id" component={Party} />
             </Route>
           </Route>
         </Router>
