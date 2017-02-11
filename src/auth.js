@@ -11,6 +11,7 @@ import decode from 'jwt-decode';
 
 const NEXT_PATH_KEY = 'next_path';
 const ID_TOKEN_KEY = 'id_token';
+const FIREBASE_ID_TOKEN_KEY = 'fb_id_token';
 const ACCESS_TOKEN_KEY = 'access_token';
 const PROFILE_KEY = 'profile';
 const LOGIN_ROUTE = '/login';
@@ -37,7 +38,40 @@ const auth0Authentication = new auth0.Authentication({
 
 const events = new EventEmitter();
 
-const updateFirebaseUser = id => firebase.database().ref(`users/${id}`).set(getFirebaseProfile())
+const getFirebaseProfile = () => {
+  return R.omit([
+    'clientID', 
+    'global_client_id', 
+    'last_ip',
+    'last_login',
+    'logins_count',
+    'user_id', 
+    'sub'
+  ], getProfile())
+}
+
+const updateFirebaseUser = id => firebase.database().ref(`users/${id}`).update(getFirebaseProfile())
+
+const setFirebaseIdToken = idToken => localStorage.setItem(FIREBASE_ID_TOKEN_KEY, idToken);
+// const getFirebaseIdToken = () =>  localStorage.getItem(FIREBASE_ID_TOKEN_KEY);
+
+// function createParty(userID) {
+//   // A party entry.
+//   var partyData = {
+//     owner: userID,
+//     title: 'party'
+//   };
+
+//   // Get a key for a new party.
+//   var newPartyKey = firebase.database().ref().child('parties').push().key;
+
+//   // Write the new party's data simultaneously in the parties list and the user's party list.
+//   var updates = {};
+//   updates[`/parties/${newPartyKey}`] = partyData;
+//   updates[`/users/${userID}/parties/${newPartyKey}`] = true;
+
+//   return firebase.database().ref().update(updates);
+// }
 
 // listen to when the user gets authenticated and then save the profile
 lock.on('authenticated', authResult => {
@@ -48,6 +82,7 @@ lock.on('authenticated', authResult => {
     }
     console.log('Firebase | Logged as', user.uid)
     updateFirebaseUser(user.uid)
+    // createParty(user.uid)
   })
 
   setIdToken(authResult.idToken);
@@ -76,8 +111,11 @@ lock.on('authenticated', authResult => {
     // Make a call to the Auth0 '/delegate'
     auth0Authentication.delegation(delegationOptions, (err, result) => {
       if(!err) {
+        const { idToken } = result;
+        // Immediatly store Firebase token for later use
+        setFirebaseIdToken(idToken);
         // Exchange the delegate token for a Firebase auth token
-        firebase.auth().signInWithCustomToken(result.idToken).catch(error => {
+        firebase.auth().signInWithCustomToken(idToken).catch(error => {
           console.log(error);
         });
       }
@@ -208,18 +246,6 @@ function getProfile() {
   return JSON.parse(localStorage.getItem(PROFILE_KEY));
 }
 
-const getFirebaseProfile = () => {
-  return R.omit([
-    'clientID', 
-    'global_client_id', 
-    'last_ip',
-    'last_login',
-    'logins_count',
-    'user_id', 
-    'sub'
-  ], getProfile())
-}
-
 function clearProfile() {
   localStorage.removeItem(PROFILE_KEY);
   events.emit('profile_updated', null);
@@ -236,6 +262,7 @@ function setAccessToken(accessToken) {
 function getIdToken() {
   return localStorage.getItem(ID_TOKEN_KEY);
 }
+
 
 function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
