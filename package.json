@@ -29,9 +29,12 @@
     "deploy": "npm run build && firebase deploy",
     "start": "react-scripts start",
     "now-start": "serve ./build --single",
-    "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build": "react-scripts build && yarn run delete-maps",
+    "delete-maps": "npm run delete-map-files && yarn run delete-references-to-map-files",
+    "delete-map-files": "find ./build -name '*.map' -delete",
+    "delete-references-to-map-files": "find ./build -type f \\( -name '*.css' -o -name '*.js' \\) -exec sed -i '' -e '/sourceMappingURL/d' {} +"
   },
   "proxy": "http://localhost:3001"
 }
