@@ -1,13 +1,20 @@
 .NotFound {
+  background: #fff;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+.NotFound img {
+  width: 50%;
+  margin-top: 2rem;
+}
+
 .NotFound .NotFound-Header {
   color: #aaa;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 300;
   text-transform: uppercase;
 }
