@@ -31,8 +31,8 @@
     "now-start": "serve ./build --single",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build": "react-scripts build && yarn run delete-maps",
-    "delete-maps": "npm run delete-map-files && yarn run delete-references-to-map-files",
+    "build": "react-scripts build && npm run delete-maps",
+    "delete-maps": "npm run delete-map-files && npm run delete-references-to-map-files",
     "delete-map-files": "find ./build -name '*.map' -delete",
     "delete-references-to-map-files": "find ./build -type f \\( -name '*.css' -o -name '*.js' \\) -exec sed -i '' -e '/sourceMappingURL/d' {} +"
   },
